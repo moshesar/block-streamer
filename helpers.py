@@ -34,7 +34,7 @@ def load_providers(path: str) -> List[Provider]:
             if data.pop("api_key", False):
                 key = os.getenv(f"{data['name']}_API_KEY")
                 if key:
-                    data["url"] = f"{data['url'].rstrip('/ ')}/{key}"
+                    data["url"] = f"{data['url']}/{key}"
                 else:
                     raise ValueError(f"Missing API key for {_id}")
 

@@ -21,7 +21,6 @@ class W3Client:
     def connect(self):
         """Connect to the provider."""
         try:
-            # Set up the Web3 connection
             self.w3 = Web3(
                 Web3.HTTPProvider(
                     self.provider.url,
@@ -29,7 +28,6 @@ class W3Client:
                 )
             )
 
-            # Check if the connection is successful
             if not self.w3.is_connected():
                 raise ConnectionError(
                     f"Failed to connect to provider: {self.provider.name}"
@@ -69,6 +67,7 @@ class W3Client:
             raise
 
     def validate_block(self, block: dict) -> Block:
+        """Validating using Pydantic model... could be extended"""
         try:
             block = Block.from_raw(block)
             logger.info(f"Validated | #{block.number}")
@@ -81,7 +80,7 @@ class W3Client:
             raise
 
     def process_block(self, block: Block):
-        """For now just log it"""
+        """Just logging for now..."""
         try:
             logger.info(
                 f"Processed | #{block.number} | ts: {block.timestamp} | txs: {block.tx_count}"
