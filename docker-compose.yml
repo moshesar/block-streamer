@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  block-streamer:
+    build: .
+    volumes:
+      - ./.env:/app/.env:ro
+    environment:
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    volumes:
+      - ./tests:/app/tests:ro
+    command: ["poetry", "run", "pytest", "-v"] 
