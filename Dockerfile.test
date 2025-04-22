@@ -1,0 +1,25 @@
+# Use Python 3.10 slim image as base
+FROM python:3.10-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install Poetry
+RUN pip install poetry==1.7.1
+
+# Copy project files
+COPY pyproject.toml poetry.lock README.md ./
+COPY core/ ./core/
+COPY models/ ./models/
+COPY tests/ ./tests/
+COPY *.py ./
+COPY providers.yml ./
+
+# Configure Poetry to not create virtual environment in container
+RUN poetry config virtualenvs.create false
+
+# Install all dependencies including dev dependencies
+RUN poetry install --no-interaction --no-ansi
+
+# Default command (can be overridden)
+CMD ["poetry", "run", "pytest", "-v"]

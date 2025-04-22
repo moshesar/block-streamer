@@ -1,4 +1,3 @@
-
 import pytest
 
 from models.provider import Provider

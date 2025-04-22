@@ -8,15 +8,82 @@ A lightweight Ethereum block streamer that fetches blocks from the blockchain us
 - **Hot-swappable Providers**: Automatically switch between providers if one fails
 - **Resilient Processing**: Retry logic and error handling to ensure no blocks are missed
 - **Lightweight Design**: Minimal code with separation of concerns
+- **Containerized**: Easy deployment with Docker
 
-## Requirements
+## Quick Start with Docker
+
+The easiest way to run the service is using Docker Compose:
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/block-streamer.git
+cd block-streamer
+
+# Create and edit the environment file for sensitive data
+touch .env
+
+# Add your API keys to .env:
+ALCHEMY_API_KEY=your_alchemy_key
+INFURA_API_KEY=your_infura_key
+
+# Build the Docker images
+docker-compose build
+
+# Start the service (with logs)
+docker-compose up block-streamer
+
+# Or start in detached mode (background)
+docker-compose up -d block-streamer
+
+# View logs when running in detached mode
+docker-compose logs -f block-streamer
+
+# Stop the service
+docker-compose down
+```
+
+## Running Tests with Docker
+
+```bash
+# Run all tests
+docker-compose run tests
+
+# Run specific test file
+docker-compose run tests poetry run pytest tests/unit/test_models.py
+
+# Run with coverage
+docker-compose run tests poetry run pytest --cov=.
+```
+
+## Local Development Setup
+
+### Prerequisites
 
 - Python 3.10+
-- Web3.py
-- PyYAML
-- Pydantic
+- Docker and Docker Compose (for containerized deployment)
+- Git
+- A text editor or IDE
+- Access to at least one Ethereum RPC provider (Alchemy, Infura, or others)
+- curl or wget (for Poetry installation)
 
-## Installation
+### Installing Poetry
+
+```bash
+# For macOS/Linux/WSL:
+curl -sSL https://install.python-poetry.org | python3 -
+
+# For Windows PowerShell:
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python3 -
+
+# Add Poetry to your PATH (if not automatically added)
+# For macOS/Linux, add to your ~/.bashrc or ~/.zshrc:
+export PATH="$HOME/.local/bin:$PATH"
+
+# Verify installation
+poetry --version
+```
+
+### Installation
 
 ```bash
 # Clone the repository
@@ -24,29 +91,78 @@ git clone https://github.com/yourusername/block-streamer.git
 cd block-streamer
 
 # Install dependencies
-pip install -e .
+poetry install
+
+# Get the path to the virtual environment
+poetry env info --path
+
+# Activate virtual environment (use the path from previous command)
+source $(poetry env info --path)/bin/activate
+
+# Run the service
+python main.py
+```
+
+### Running Tests Locally
+
+```bash
+# Run all tests
+poetry run pytest
+
+# Run specific test file
+poetry run pytest tests/unit/test_models.py
+
+# Run with coverage
+poetry run pytest --cov=.
 ```
 
 ## Configuration
 
-Update the `providers.yml` file with your own provider URLs:
+### Provider Configuration
+
+The service supports multiple Ethereum RPC providers for redundancy. Configure your providers in `providers.yml`:
 
 ```yaml
 providers:
-  provider1:
-    name: "Provider Name"
-    url: "https://your-provider-url"
+  chainstack:
+    name: "CHAINSTACK"
+    url: "https://your-chainstack-url"
+    api_key: false
+    type: "http"
+
+  alchemy:
+    name: "ALCHEMY"
+    url: "https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+    api_key: true
+    type: "http"
+
+  infura:
+    name: "INFURA"
+    url: "https://mainnet.infura.io/v3/${INFURA_API_KEY}"
+    api_key: true
     type: "http"
 ```
 
-Make sure to add at least two providers for failover functionality.
+### Environment Variables
 
-## Usage
+The project uses two types of configuration:
 
-```bash
-# Start the block streamer
-python main.py
+1. **Sensitive Information** (in `.env`):
+```env
+# Provider API keys only
+ALCHEMY_API_KEY=your_alchemy_key
+INFURA_API_KEY=your_infura_key
 ```
+
+2. **Service Configuration** (in `config.py`):
+```python
+# These settings are managed in the config.py file
+LOG_LEVEL=INFO
+PROVIDER_TIMEOUT=30
+POLL_INTERVAL=2
+```
+
+Do not put non-sensitive configuration in `.env` - use the `config.py` file instead.
 
 ## Project Structure
 
@@ -57,14 +173,21 @@ python main.py
 - `models/`: Data models
   - `provider.py`: Provider configuration model
   - `block.py`: Block data model
+- `tests/`: Test suite
+  - `unit/`: Unit tests
+  - `integration/`: Integration tests
 - `config.py`: Configuration settings
 - `helpers.py`: Utility functions
 - `providers.yml`: Provider configuration file
 
-## Customization
+## Contributing
 
-You can adjust the following parameters in `config.py`:
-- `POLL_INTERVAL`: Time between block checks
-- `PROVIDER_TIMEOUT`: Provider request timeout
-- `PROVIDER_MAX_RETRIES`: Number of retry attempts
-- `HEALTH_CHECK_INTERVAL`: Interval for provider health checks
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
