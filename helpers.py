@@ -2,6 +2,7 @@ import os
 from typing import List
 
 import yaml
+from dotenv import load_dotenv
 
 import config
 from models.provider import Provider
@@ -12,47 +13,41 @@ logger = logging.getLogger("helpers")
 
 
 def load_providers(path: str) -> List[Provider]:
-    """Load all providers from the YAML configuration file."""
-    logger.info(f"Loading providers from {path}")
+    """Load providers from YAML config and inject API keys from environment."""
+    try:
+        load_dotenv()
 
-    with open(path, "r") as f:
-        yaml_config = yaml.safe_load(f)
+        with open(path) as f:
+            yaml_config = yaml.safe_load(f)
 
-    if not yaml_config or "providers" not in yaml_config:
-        raise ValueError("Invalid or empty providers configuration")
+        if (
+            not yaml_config
+            or "providers" not in yaml_config
+            or len(yaml_config["providers"]) < 2
+        ):
+            raise ValueError("Config must contain at least two providers")
 
-    if len(yaml_config["providers"].items()) < 2:
-        raise ValueError("At least two providers must be provided.")
+        providers = []
+        for _id, data in yaml_config["providers"].items():
+            logger.info(f"Loading provider: {data['name']}")
 
-    providers = []
-
-    for provider_id, provider_data in yaml_config["providers"].items():
-        # Add the provider ID as the name if not specified
-        if "name" not in provider_data:
-            provider_data["name"] = provider_id
-
-        # Handle API key if needed
-        if provider_data.get("api_key") is True:
-            env_key = f"{provider_id.upper()}_API_KEY"
-            api_key = os.getenv(env_key)
-            if not api_key:
-                logger.warning(
-                    f"No API key found in .env for {provider_id} (expected {env_key})"
-                )
-            else:
-                # Remove any trailing slashes from URL and spaces
-                provider_data["url"] = provider_data["url"].rstrip("/ ")
-                if "?" in provider_data["url"]:
-                    provider_data["url"] = f"{provider_data['url']}&apikey={api_key}"
+            if data.pop("api_key", False):
+                key = os.getenv(f"{data['name']}_API_KEY")
+                if key:
+                    data["url"] = f"{data['url'].rstrip('/ ')}/{key}"
                 else:
-                    provider_data["url"] = f"{provider_data['url']}/{api_key}"
+                    raise ValueError(f"Missing API key for {_id}")
 
-        # Remove the api_key flag from the data before creating Provider
-        provider_data.pop("api_key", None)
+            providers.append(Provider(**data))
 
-        provider = Provider(**provider_data)
-        providers.append(provider)
-        logger.info(f"Loaded provider: {provider.name}")
+        return providers
 
-    logger.info(f"Loaded {len(providers)} providers from configuration")
-    return providers
+    except FileNotFoundError:
+        logger.error(f"Config file not found: {path}")
+        raise
+    except yaml.YAMLError:
+        logger.error(f"Invalid YAML in config: {path}")
+        raise
+    except Exception as e:
+        logger.error(f"Failed to load providers: {str(e)}")
+        raise
