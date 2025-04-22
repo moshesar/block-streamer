@@ -1,18 +1,18 @@
 providers:
   chainstack:
-    name: "Chainstack"
+    name: "CHAINSTACK"
     url: "https://nd-422-757-666.p2pify.com/0a9d79d93fb2f4a4b1e04695da2b77a7"
     api_key: false
     type: "http"
 
   alchemy:
-    name: "Alchemy"
+    name: "ALCHEMY"
     url: "https://eth-mainnet.g.alchemy.com/v2"
     api_key: true
     type: "http"
 
   infura:
-    name: "Infura"
+    name: "INFURA"
     url: "https://mainnet.infura.io/v3"
     api_key: true
     type: "http"
