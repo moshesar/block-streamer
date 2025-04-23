@@ -1,5 +1,7 @@
 # Block Streamer
 
+<img src="Logo.png" alt="StockLight Logo" width="200"/>
+
 A lightweight Ethereum block streamer that fetches blocks from the blockchain using multiple providers with automatic failover.
 
 ## Features
