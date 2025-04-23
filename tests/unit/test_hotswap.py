@@ -30,10 +30,8 @@ def mock_w3_client():
 
 
 def test_hotswap_manager_initialization(mock_providers, mock_w3_client):
-    # Execute
     manager = HotswapManager(mock_providers)
 
-    # Assert
     assert manager.providers == mock_providers
     assert len(manager.clients) == 2
     assert manager.current_provider == "Provider1"  # First provider should be selected
@@ -41,41 +39,33 @@ def test_hotswap_manager_initialization(mock_providers, mock_w3_client):
 
 
 def test_hotswap_manager_get_client_healthy(mock_providers, mock_w3_client):
-    # Setup
     manager = HotswapManager(mock_providers)
 
-    # Execute
     client = manager.get_client()
 
-    # Assert
     assert client.provider.name == "Provider1"
     assert manager.current_provider == "Provider1"
 
 
 def test_hotswap_manager_swap_on_unhealthy(mock_providers, mock_w3_client):
-    # Setup
     manager = HotswapManager(mock_providers)
 
     # Make first provider unhealthy
     manager.clients["Provider1"].health.is_healthy = False
 
-    # Execute
     client = manager.get_client()
 
-    # Assert
     assert manager.current_provider == "Provider2"
     assert client.provider.name == "Provider2"
 
 
 def test_hotswap_manager_no_healthy_providers(mock_providers, mock_w3_client):
-    # Setup
     manager = HotswapManager(mock_providers)
 
     # Make all providers unhealthy
     for client in manager.clients.values():
         client.health.is_healthy = False
 
-    # Execute & Assert
     with pytest.raises(RuntimeError, match="No healthy providers available"):
         manager.get_client()
 
@@ -89,6 +79,5 @@ def test_hotswap_manager_initialization_failure(mock_providers, mock_w3_client):
 
     mock_w3_client.side_effect = fail_connect
 
-    # Execute & Assert
     with pytest.raises(RuntimeError, match="No healthy providers available"):
         HotswapManager(mock_providers)

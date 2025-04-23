@@ -76,7 +76,7 @@ class W3Client:
 
         except Exception as e:
             self.health.block_failures += 1
-            logger.error(f"Error validating #{block}: {str(e)}")
+            logger.error(f"Error validating #{block.number}: {str(e)}")
             raise
 
     def process_block(self, block: Block):
@@ -86,5 +86,5 @@ class W3Client:
                 f"Processed | #{block.number} | ts: {block.timestamp} | txs: {block.tx_count}"
             )
         except Exception as e:
-            logger.error(f"Error processing block #{block}: {str(e)}")
+            logger.error(f"Error processing block #{block.number}: {str(e)}")
             self.health.block_failures += 1

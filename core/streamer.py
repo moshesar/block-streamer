@@ -29,9 +29,7 @@ class BlockStreamer:
                     )
 
                 if current_block > self.last_block:
-                    logger.info(
-                        f"Found {current_block - self.last_block} new blocks. Processing..."
-                    )
+                    logger.info(f"Found {current_block - self.last_block} new blocks")
 
                     for block_number in range(self.last_block + 1, current_block + 1):
                         block_data = client.get_block(block_number)

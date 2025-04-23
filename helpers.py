@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 import config
 from models.provider import Provider
 
-# Get centralized logger
 logging = config.setup_logging()
 logger = logging.getLogger("helpers")
 
@@ -31,12 +30,12 @@ def load_providers(path: str) -> List[Provider]:
         for _id, data in yaml_config["providers"].items():
             logger.info(f"Loading provider: {data['name']}")
 
-            if data.pop("api_key", False):
-                key = os.getenv(f"{data['name']}_API_KEY")
-                if key:
-                    data["url"] = f"{data['url']}/{key}"
+            if data.get("api_key", False):
+                api_key = os.getenv(f"{data['name']}_API_KEY")
+                if api_key:
+                    data["url"] = f"{data['url']}/{api_key}"
                 else:
-                    raise ValueError(f"Missing API key for {_id}")
+                    logger.warning(f"Missing API key for {_id}")
 
             providers.append(Provider(**data))
 
