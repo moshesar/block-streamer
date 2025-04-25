@@ -3,7 +3,7 @@
 <img src="Logo.png" alt="StockLight Logo" width="200"/>
 
 A lightweight Ethereum block streamer that fetches blocks from the blockchain using multiple providers with automatic failover.
-
+Serves as a simplified monolithic example to demonstrate the core concepts.
 ## Features
 
 - **Multiple Provider Support**: Connect to multiple Ethereum RPC providers (Alchemy, Infura, etc.)
@@ -63,19 +63,12 @@ docker-compose run tests poetry run pytest --cov=.
 
 - Python 3.10+
 - Docker and Docker Compose (for containerized deployment)
-- Git
-- A text editor or IDE
-- Access to at least one Ethereum RPC provider (Alchemy, Infura, or others)
-- curl or wget (for Poetry installation)
+
 
 ### Installing Poetry
 
 ```bash
-# For macOS/Linux/WSL:
 curl -sSL https://install.python-poetry.org | python3 -
-
-# For Windows PowerShell:
-(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python3 -
 
 # Add Poetry to your PATH (if not automatically added)
 # For macOS/Linux, add to your ~/.bashrc or ~/.zshrc:
@@ -177,7 +170,6 @@ Do not put non-sensitive configuration in `.env` - use the `config.py` file inst
   - `block.py`: Block data model
 - `tests/`: Test suite
   - `unit/`: Unit tests
-  - `integration/`: Integration tests
 - `config.py`: Configuration settings
 - `helpers.py`: Utility functions
 - `providers.yml`: Provider configuration file
@@ -189,7 +181,3 @@ Do not put non-sensitive configuration in `.env` - use the `config.py` file inst
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
